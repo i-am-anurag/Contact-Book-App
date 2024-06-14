@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Group Dashboard</title>
+    <!-- Bootstrap CSS CDN link -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/dashboard">Dashboard</a>
+        <a class="navbar-brand" href="#">Group</a>
+
+
+        <div class="navbar-nav ml-auto">
+            <!-- Logout Button -->
+            <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col">
+                <input type="text" id="nameSearch" class="form-control" placeholder="Search by name">
+            </div>
+            <div class="col">
+                <input type="date" id="dateSearch" class="form-control datepicker" placeholder="Search by date">
+            </div>
+            <button type="button" id="searchButton" class="btn btn-secondary mr-2 ml-3">
+                Filter
+            </button>
+            <button type="button" id="resetSearch" class="btn btn-danger mr-2 ml-3">
+                Reset
+            </button>
+        </div>
+    </div>
+</div>
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>User Groups</h2>
+            <div class="col-md-7 d-flex align-items-center justify-content-end">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addContactModal">
+                    Create Group
+                </button>
+            </div>
+        </div>
+        <table id="contactsTable" class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">createdAt</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="modal fade" id="addContactModal" tabindex="-1" role="dialog" aria-labelledby="addContactModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addContactModalLabel">Add Group</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Contact Form -->
+                    <form id="addContactForm">
+                        <div class="form-group">
+                            <label for="contactName">Name</label>
+                            <input type="text" class="form-control" id="contactName" placeholder="Enter name" required>
+                        </div>
+                        <!-- <div class="form-group">
+                            <label for="contactEmail">Email</label>
+                            <input type="email" class="form-control" id="contactEmail" placeholder="Enter email">
+                        </div> -->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addContact()">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editContactModal" tabindex="-1" role="dialog" aria-labelledby="editContactModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editContactModalLabel">Edit Group</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for editing contact details -->
+                    <form id="editContactForm">
+                        <div class="form-group">
+                            <label for="editName">Name</label>
+                            <input type="text" class="form-control" id="editName" placeholder="Enter name">
+                            <input type="hidden" class="form-control" id="editContactId">
+                        </div>
+                        <!-- Add more fields as needed for editing -->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="updateContact()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this Group <span id="contactNameToDelete"></span>?</p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="deleteContactId">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="deleteContactBtn" onclick="deleteContact()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="d-flex justify-content-end mt-3 col-md-9 text-right">
+        <nav aria-label="Contacts Pagination" style="margin-left: -15px;">
+            <div class="input-group" style="padding-left: 30px; ">
+                <label for="pageSize" class="ml-3 align-self-center">Page Size:</label>
+                <!-- <select id="pageSize" class="custom-select ml-2">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                </select> -->
+                <input type="number" id="pageSizeInput" class="form-control ml-2" value="10" min="1" style="width: 70px;">
+                <div class="input-group-prepend ml-3">
+                    <button id="prevPage" class="btn btn-primary btn-sm" style="height: 38px; width: 70px;">Previous</button>
+                </div>
+                <span id="pageInfo" class="align-self-center mx-2"></span>
+                <div class="input-group-append">
+                    <button id="nextPage" class="btn btn-primary btn-sm" style="height: 38px; width: 70px;">Next</button>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div id="contactToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 20px; right: 20px;">
+        <div class="toast-body bg-success">
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <!-- Toast content will be appear here -->
+        </div>
+    </div>
+    
+
+    <!-- Bootstrap JS and jQuery CDN links -->
+    <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="/js/group.js"></script>
+</body>
+</html>

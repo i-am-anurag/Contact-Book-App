@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Book - Login</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" id="home" href="/">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center mb-4">Login</h2>
+                <form id="signin-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="text" class="form-control" id="email" placeholder="Enter email address">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Enter password">
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">Remember Me</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                </form>
+                <div class="text-center mb-4">
+                    <a href="/signup" class="text-blue-500 hover:text-blue-600 text-sm font-semibold">Don't have account?</a>
+                    <p id="loginError" style="color: red; display: none;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="contactToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 20px; right: 20px;">
+        <div class="toast-body bg-success">
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <!-- Toast content will appear here -->
+        </div>
+    </div>
+
+<!-- jQuery, Bootstrap JS, and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+    $('#signin-form').submit(function(event) {
+        event.preventDefault();
+
+        const email = $('#email').val();
+        const password = $('#password').val();
+        const rememberMe = $('#rememberMe').is(':checked');
+
+        const user = {
+            email: email,
+            password: password,
+            rememberMe: rememberMe,
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '/api/user/signin',
+            data: JSON.stringify(user),
+            contentType: 'application/json',
+            success: function(response) {
+                $('#loginSuccess').text("user Login Successfully");
+                $('#signupSuccess').show();
+                // Handle successful signup (redirect, show success message, etc.)
+                const token = response.token;
+                localStorage.setItem('token', token);
+                $('#contactToast .toast-body').removeClass('bg-danger').addClass('bg-success');
+                $('.toast-body').text(`${response.message}`);
+                $('.toast').toast('show');
+                window.location.href = 'dashboard';
+            },
+            error: function(xhr, status, error) {
+                const errorMessage = JSON.parse(xhr.responseText).message;
+                $('#loginError').text(errorMessage);
+                $('#loginError').show();
+                // Handle error response (show error message, etc.)
+            }
+        });
+    });
+});
+
+</script>
+</body>
+</html>

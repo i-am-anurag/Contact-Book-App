@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Book - Signup</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" id="home" href="/">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center mb-4">Signup</h2>
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" placeholder="Enter username">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Signup</button>
+                </form>
+                <div class="text-center mb-4">
+                    <a href="/login" class="text-blue-500 hover:text-blue-600 text-sm font-semibold">Already have an account?</a>
+                    <p id="signupError" style="color: red; display: none;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="contactToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 20px; right: 20px;">
+        <div class="toast-body bg-success">
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <!-- Toast content will appear here -->
+        </div>
+    </div>
+
+<!-- jQuery, Bootstrap JS, and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+    $('#signup-form').submit(function(event) {
+        event.preventDefault();
+
+        const name = $('#username').val();
+        const email = $('#email').val();
+        const password = $('#password').val();
+
+        const user = {
+            username: name,
+            email: email,
+            password: password
+        };
+
+        console.log(user);
+
+        $.ajax({
+            type: 'POST',
+            url: '/api/user/signup',
+            data: JSON.stringify(user),
+            contentType: 'application/json',
+            success: function(response) {
+                console.log('Signup successful!');
+                $('#contactToast .toast-body').removeClass('bg-danger').addClass('bg-success');
+                $('.toast-body').text(`${response.message}`);
+                $('.toast').toast('show');
+                window.location.href = '/';
+            },
+            error: function(xhr, status, error) {
+                    const errorMessage = JSON.parse(xhr.responseText).message;
+                    $('#signupError').text(errorMessage);
+                    $('#signupError').show();
+            }
+            });
+        });
+    });
+
+</script>
+</body>
+</html>
+
