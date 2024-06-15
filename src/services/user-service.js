@@ -3,10 +3,12 @@ const jwt = require('jsonwebtoken');
 const {UserRepository} = require('../repository');
 const { clientErrorCodes, serverErrorCodes } = require('../utils/status-code');
 const {JWT_SECERET_KEY, TOKEN_EXPIRY} = require('../config/server-config');
+const EmailService = require('./email-service');
 
 class UserService{
     constructor(){
         this._userRepository = new UserRepository();
+        this._emailService = new EmailService();
     }
 
     generateToken(userId,rememberMe){
@@ -105,6 +107,40 @@ class UserService{
                 }
             }
             return user;
+        } catch (error) {
+            throw {
+                statusCode:error.statusCode || serverErrorCodes['INTERNAL_SERVER_ERROR'],
+                message:error.message,
+            }
+        }
+    }
+
+    async forgotPassword(email){
+        try {
+            const user = await this._userRepository.find({email:email});
+            if(!user){
+                throw {
+                    statusCode:clientErrorCodes['NOT_FOUND'],
+                    message:'User Not Found',
+                }
+            }
+            console.log("Found User is:",user);
+            const token = this.generateToken(user._id,false);
+            const resetLink = `${process.env.APP_URL}api/reset-password/?token=${token}`;
+            const mailData = {
+                subject: 'Password reset Token',
+                email: email,
+                text: `Please click on this link to reset your password: ${resetLink}`,
+            }
+            const mailSendRes = await this._emailService.sendMail(mailData);
+            if(mailSendRes.error){
+                throw {
+                    statusCode:serverErrorCodes['INTERNAL_SERVER_ERROR'],
+                    message:'Failed to send mail',
+                }
+            }
+
+            return mailSendRes;
         } catch (error) {
             throw {
                 statusCode:error.statusCode || serverErrorCodes['INTERNAL_SERVER_ERROR'],

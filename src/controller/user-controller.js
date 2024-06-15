@@ -135,5 +135,28 @@ module.exports = {
                 message:error.message,
             });
         }
+    },
+
+    async forgotPassword(req,res){
+        try {
+            const {userEmail:email} = req.body;
+            checkRequiredFields(['userEmail'],req.body);
+            if(!validateEmail(email)){
+                throw {
+                    statusCode:clientErrorCodes['BAD_REQUEST'],
+                    message:"Invalid Email",
+                }
+            }
+            const mailRes = await userService.forgotPassword(email);
+            return res.status(SucessCodes['OK']).json({
+                flag:1,
+                message:"Password reset link sent successfully",
+            });
+        } catch (error) {
+            return res.status(error.statusCode).json({
+                flag:0,
+                message:error.message,
+            });
+        }
     }
 }

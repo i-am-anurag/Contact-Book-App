@@ -20,4 +20,6 @@ module.exports = {
     SALT_ROUNDS,
     JWT_SECERET_KEY:process.env.JWT_SECERET_KEY,
     TOKEN_EXPIRY:process.env.TOKEN_EXPIRY,
+    EMAIL_ID : process.env.EMAIL_ID,
+    EMAIL_PASSWORD : process.env.EMAIL_PASSWORD,
 }
