@@ -5,7 +5,6 @@ const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS);
 const connect = async()=>{
     try {
         const connectionString = `mongodb://${process.env.DB_HOST}/${process.env.DB_NAME}`;
-        // await mongoose.connect('mongodb://localhost/contact_app_db');
         await mongoose.connect(connectionString);
     } catch (error) {
         console.log("There is an error for mongoDB connection:",error);
