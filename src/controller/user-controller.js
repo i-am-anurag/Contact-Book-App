@@ -158,5 +158,25 @@ module.exports = {
                 message:error.message,
             });
         }
+    },
+
+    async resetPassword(req,res){
+        try {
+            const {token} = req.query;
+            console.log("Token is:",token);
+            const userData = req.body;
+            checkRequiredFields(['token','password','confirmPassword'],{...req.query,...req.body});
+            const user = await userService.resetPassword(token,userData);0
+
+            return res.status(SucessCodes['OK']).json({
+                flag:1,
+                message:"Password reset successfully",       
+            });
+        } catch (error) {
+            return res.status(error.statusCode).json({
+                flag:0,
+                message:error.message,
+            });
+        }
     }
 }

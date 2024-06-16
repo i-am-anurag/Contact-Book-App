@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const {UserRepository} = require('../repository');
 const { clientErrorCodes, serverErrorCodes } = require('../utils/status-code');
-const {JWT_SECERET_KEY, TOKEN_EXPIRY} = require('../config/server-config');
+const {JWT_SECERET_KEY, TOKEN_EXPIRY, SALT_ROUNDS} = require('../config/server-config');
 const EmailService = require('./email-service');
 
 class UserService{
@@ -19,6 +19,17 @@ class UserService{
             throw {
                 statusCode:serverErrorCodes['INTERNAL_SERVER_ERROR'],
                 message:error.message,
+            }
+        }
+    }
+
+    decodeToken(token) {
+        try {
+            return jwt.verify(token, JWT_SECERET_KEY);
+        } catch (error) {
+            throw {
+                statusCode: clientErrorCodes['UNAUTHORIZED'],
+                message: error.message,
             }
         }
     }
@@ -147,6 +158,50 @@ class UserService{
                 message:error.message,
             }
         }
+    }
+
+    async resetPassword(token,userData){
+        try {
+            const {password,confirmPassword} = userData;
+            const decodeToken = this.decodeToken(token);
+            if(!decodeToken){
+                throw {
+                    statusCode:clientErrorCodes['UNAUTHORIZED'],
+                    message:'Invalid Token',
+                }
+            }
+            const user = await this._userRepository.find({_id:decodeToken.id});
+            if(!user){
+                throw {
+                    statusCode: clientErrorCodes['NOT_FOUND'],
+                    message:'User Not Found',
+                }
+            }
+            
+            if(password !== confirmPassword){
+                throw {
+                    statusCode:clientErrorCodes['BAD_REQUEST'],
+                    message:'Password and Confirm Password do not match',
+                }
+            }
+
+            const SALT = bcrypt.genSaltSync(SALT_ROUNDS);
+            const hashedPassword = bcrypt.hashSync(password, SALT);
+            const updatedUser = await this._userRepository.update({_id:decodeToken.id},{password:hashedPassword});
+            if(!updatedUser){
+                throw {
+                    statusCode:clientErrorCodes['BAD_REQUEST'],
+                    message:'Failed to update password',
+                }
+            }
+            
+            return updatedUser;
+        } catch (error) {
+            throw {
+                statusCode:error.statusCode || serverErrorCodes['INTERNAL_SERVER_ERROR'],
+                message:error.message,
+            }
+        } 
     }
 };
 
