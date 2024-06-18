@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="chat-container">
+                <div class="chat-messages">
+                    <!-- Chat messages will be displayed here -->
+                    <div class="message">
+                        <div class="sender">Sender Name</div>
+                        <div class="text">Hello, this is a sender message.</div>
+                    </div>
+                    <div class="message">
+                        <div class="receiver">Receiver Name</div>
+                        <div class="text">Hi, this is a receiver message.</div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" class="form-control" placeholder="Type your message...">
+                    <button class="btn btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/chat.js"></script>
