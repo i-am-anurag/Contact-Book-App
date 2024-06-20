@@ -3,9 +3,7 @@ const path = require('path');
 const ejs = require('ejs');
 const cors = require('cors');
 const http = require('http');
-const server = http.createServer(app);
 const {Server} = require('socket.io');
-const io = new Server(server);
 const {PORT,connect} = require('./config/server-config');
 const appgetRoutes = require('./routes/app-get-routes');
 const appRoutes = require('./routes');
@@ -13,6 +11,8 @@ const bodyParser = require('body-parser');
 const { isIpbanned } = require('./middleware/auth-middleware');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
 app.use(cors());
 // ejs config
