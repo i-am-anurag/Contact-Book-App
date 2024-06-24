@@ -1,8 +1,19 @@
 const mongoose = require("mongoose");
-const { getSchemaByName } = require("../schema");
 const { debug_log } = require("../utils/lib/log.lib");
 const { success_res } = require("../utils/lib/general.lib");
 
+const getSchemaByName = function (schemaName) {
+    let Schema = null;
+    let modulePath = './' + schemaName + '.schema.js';
+    try {
+        Schema = require(modulePath);
+    } catch (error) {
+        error_log(`Error loading module ${modulePath}:`, error);
+        return null;
+    }
+
+    return Schema;
+};
 
 class CRUDModel {
     constructor(modelName, schema) {
